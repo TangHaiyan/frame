@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+     <meta charset="utf-8">
+	<title>表单验证</title>
+     <link rel="stylesheet" type="text/css" href="index.css"> <!-- 基础样式   -->
+     <link rel="stylesheet" type="text/css" href="load_basic.css"> 
+
+</head>
+<body>
+<div>
+<form id="sign" name="sign" method="post" action="">
+<p>
+     <label>名称</label>
+     <input type="text" name="name1" value="" required>
+</p>
+<p class="tips"><span></span></p>
+<p>
+     <label>密码</label>
+     <input type="password" name="name2" value="">
+     <p class="tips"><span></span></p>
+</p>
+<p>
+     <label>密码确认</label>
+     <input type="password" name="name2" value="" >
+</p>
+<p class="tips"><span></span></p>
+<p>
+     <label>邮箱</label>
+     <input type="text" name="name3" value="">
+</p>
+<p class="tips"><span></span></p>
+<p>
+     <label>手机</label>
+     <input type="text" name="name3" value="">
+</p>
+<p class="tips"><span></span></p>
+<button>提交</button>
+</form>
+</div>
+<script type="text/javascript">
+// 坑
+// with作用域
+
+// 获取表单元素：
+var input_ele=document.forms[0].elements;
+var tips_ele=document.getElementsByTagName("span")
+
+//改变颜色
+function change_color(i,color){
+     input_ele[i].style.borderColor=color;
+     tips_ele[i].style.color=color;
+
+}
+
+//改变提示文字
+function change_tips(i,tips_text){
+     if (tips_ele[i].childNodes.length==0) {
+          tips_ele[i].appendChild(document.createTextNode(tips_text))
+     }
+     else{
+          tips_ele[i].childNodes[0].nodeValue=tips_text;
+     }
+}
+
+//校验不同的正则
+// 手机的正则：/^1\d{10}$/  以1开头，10位数字，且以数字结尾
+//qq号码匹配：/[1-9]\d{4,}/ 不以0开头，最少4位数字
+//邮箱正则：/\w+@\w+(\.(com|cn|net))?\.(com|cn|net)$/  fgrgrh@fhrhr.com.cn
+//4-16位的长度：/\w{1,4}\w{1,4}\w{1,4}\w{1,4}/
+// 密码正则：/(a-z){1,4}(A-Z)+(a-z){1,4}(0-9)+(a-z){1,4}(a-z){1,4}/ 由字母即数字组成，必须包含大写字母及数字，不得少于6位，
+
+/*function validata_reg(i,regobj){
+     if (!(regobj.test(input_ele[i].value))) {
+          change_color(i,"red");
+          change_tips(i,"格式不正确")
+     }
+     else{
+        return true;  
+     }
+}
+*/
+//校验长度
+/*function validata_length(i,min_length,max_length){
+     if (input_ele[i].value.length>0&&input_ele[i].value.length<min_length){
+          change_color(i,"red");
+          change_tips(i,"名称太短")
+           }
+     else if (input_ele[i].value.length>max_length) {
+          change_color(i,"red");
+          change_tips(i,"名称太长")
+           }
+     else{
+          return true
+     }*/
+
+//校验是否相同
+function validata_comfirm(i,j){
+     if (!(input_ele[i].value===input_ele[j].value)) {
+     change_color(i,"red");
+     change_tips(i,"不匹配，请重新输入");
+     input_ele[i].value=""
+     }
+     else {
+          change_color(i,"green"); 
+              if (i<input_ele.length-1) {
+                    input_ele[i+1].focus();}  //自动在下个元素获得焦点
+          change_tips(i,"");  
+          return true;
+     }
+}
+
+//校验空字符.正则
+function validata_reg(i,regobj){
+     if (input_ele[i].value==""||input_ele[i].value==null) {
+     change_color(i,"red");
+     change_tips(i,"输入不能为空");
+     }   
+     else{
+          if (!(regobj.test(input_ele[i].value))) {
+          change_color(i,"red");
+          change_tips(i,"格式不正确")
+          }
+         else{change_color(i,"green"); 
+              if (i<input_ele.length-1) {
+                    input_ele[i+1].focus();}  //自动在下个元素获得焦点
+          change_tips(i,""); 
+          return true;
+          }
+
+     }
+     
+}
+
+//添加事件
+//第一个input
+ input_ele[0].addEventListener("blur",function(){validata_reg(0,/\w{4,16}/)})
+ input_ele[0].addEventListener("focus",function(){change_tips(0,"必须，4-16个字符")})
+ input_ele[0].addEventListener("focus",function(){ change_color(0,"#808080")})
+
+
+//第二个input
+ input_ele[1].addEventListener("blur",function(){validata_reg(1,/\w*[A-Z]+\w*[0-9]+\w*\w{4,}/)})
+ input_ele[1].addEventListener("focus",function(){ change_color(1,"#808080")})
+ input_ele[1].addEventListener("focus",function(){change_tips(1,"由字母即数字组成，必须包含大写字母及数字，不得少于6位")})
+
+//第三个input
+input_ele[2].addEventListener("focus",function(){change_tips(2,"请确认密码")})
+input_ele[2].addEventListener("focus",function(){ change_color(2,"#808080")})
+input_ele[2].addEventListener("blur",function(){validata_comfirm(2,1)})
+
+//第四个input
+input_ele[3].addEventListener("focus",function(){change_tips(3,"请输入正确的国内邮箱地址")})
+input_ele[3].addEventListener("focus",function(){ change_color(3,"#808080")})
+input_ele[3].addEventListener("blur",function(){validata_reg(3,/\w+@\w+(\.(com|cn|net))?\.(com|cn|net)$/)})
+
+
+//第五个input
+input_ele[4].addEventListener("focus",function(){change_tips(4,"请输入正确的11位手机号码")})
+input_ele[4].addEventListener("focus",function(){ change_color(4,"#808080")})
+input_ele[4].addEventListener("blur",function(){validata_reg(4,/^1\d{10}$/)})
+
+ 
+ //提交
+ var btn=document.getElementsByTagName("button")[0];
+ btn.onclick=function(){
+     if (validata_reg(0,/\w{4,16}/)) {
+          if (validata_reg(1,/\w*[A-Z]+\w*[0-9]+\w*\w{4,}/)) {
+               if (validata_comfirm(2,1)) {
+                    if (validata_reg(3,/\w+@\w+(\.(com|cn|net))?\.(com|cn|net)$/)) {
+                         if (validata_reg(4,/^1\d{10}$/)) {
+
+                              alert("提交成功");
+
+                         }
+                    }
+               }
+          }
+     }
+     else(alert("提交失败"))
+ }
+
+
+</script>
+
+</body>
+</html>
